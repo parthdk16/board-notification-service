@@ -4,6 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { firstValueFrom } from 'rxjs';
 import { ResultEventDto } from './dto/result-event.dto';
+import { TokenService } from '../auth/token.service';
 
 interface ResultData {
   examName: string;
@@ -20,7 +21,10 @@ export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
   private transporter: nodemailer.Transporter;
 
-  constructor(private httpService: HttpService) {
+  constructor(
+    private httpService: HttpService,
+    private tokenService: TokenService,
+  ) {
     this.initializeTransporter();
   }
 
@@ -81,12 +85,17 @@ export class NotificationService {
     studentId: string,
   ): Promise<{ email: string; name?: string }> {
     try {
+      const token = this.tokenService.getToken();
       const userServiceUrl =
         process.env.USER_SERVICE_URL || 'http://localhost:3001';
       const response = await firstValueFrom(
         this.httpService.get(
           `${userServiceUrl}/users/internal/student/${studentId}`,
           {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-service-token': process.env.SERVICE_AUTH_TOKEN || 'abcde',
+            },
             timeout: 10000,
           },
         ),

@@ -11,14 +11,14 @@ async function publish() {
     const payload = {
       pattern: 'result_published',
       data: {
-        studentId: '685c2ba662f96da6d1b5760d',
+        studentId: 'STD2024001',
         resultData: {
           examName: 'Higher Secondary Examination Feb 2025',
-          score: 90,
+          score: 85,
           grade: 'A+',
           maxScore: 100,
           status: 'Pass',
-          date: '2025-07-03'
+          date: '2025-07-17'
         },
       },
     }

@@ -45,7 +45,7 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('Notification Service API')
+    .setTitle('API Documentation - Notification Service')
     .setDescription(
       'Microservice for handling notifications via RabbitMQ and HTTP endpoints',
     )
@@ -53,10 +53,7 @@ async function bootstrap() {
     .addTag('notifications', 'Notification management endpoints')
     .addTag('health', 'Health check endpoints')
     .addTag('microservice', 'Message pattern documentation')
-    .addServer(
-      `http://localhost:${process.env.PORT}`,
-      'Local development server',
-    )
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

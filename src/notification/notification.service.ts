@@ -5,6 +5,7 @@ import * as nodemailer from 'nodemailer';
 import { firstValueFrom } from 'rxjs';
 import { ResultEventDto } from './dto/result-event.dto';
 import { TokenService } from '../auth/token.service';
+import { CustomLogger } from 'src/logger/custom-logger.service';
 
 interface ResultData {
   examName: string;
@@ -24,6 +25,7 @@ export class NotificationService {
   constructor(
     private httpService: HttpService,
     private tokenService: TokenService,
+    private customLogger: CustomLogger,
   ) {
     this.initializeTransporter();
   }
@@ -49,10 +51,11 @@ export class NotificationService {
 
   async sendResultEmail(payload: ResultEventDto): Promise<void> {
     const { studentId, resultData } = payload;
+    let studentInfo: { email: string; name?: string } | null = null;
 
     try {
       // Get student email and details
-      const studentInfo = await this.getStudentInfo(studentId);
+      studentInfo = await this.getStudentInfo(studentId);
 
       if (!studentInfo.email) {
         throw new Error(`No email found for student ID: ${studentId}`);
@@ -72,11 +75,45 @@ export class NotificationService {
       this.logger.log(
         `Result email sent successfully to ${studentInfo.email} for student ${studentId}`,
       );
+
+      let msg="";
+      if(studentInfo.email === 'parthkulkarni1602@gmail.com'){
+        msg = ' to fallback email';
+      }
+      this.customLogger.log({
+        level: 'info',
+        message: 'Result email sent successfully'+msg,
+        studentId: studentId,
+        email: studentInfo.email,
+        status: 'success',
+        examName: resultData.examName,
+        score: resultData.score,
+        grade: resultData.grade,
+        percentage: resultData.percentage,
+        resultDate: resultData.date,
+      });
+
     } catch (error) {
       this.logger.error(
         `Failed to send result email for student ${studentId}:`,
         error.message,
       );
+      this.customLogger.error({
+        level: 'error',
+        message: 'Failed to send result email',
+        studentId: studentId,
+        email: studentInfo?.email || 'unknown',
+        status: 'failure',
+        examName: resultData?.examName,
+        score: resultData?.score,
+        grade: resultData?.grade,
+        scoreOutOf: resultData?.maxScore,
+        resultDate: resultData?.date,
+        errorMessage: error.message,
+        stackTrace: error.stack,
+        timestamp: new Date(),
+      });
+
       throw error;
     }
   }
@@ -116,6 +153,17 @@ export class NotificationService {
       // For testing purposes, use a fallback
       if (process.env.NODE_ENV === 'development') {
         this.logger.warn(`Using fallback email for student ${studentId}`);
+
+        this.customLogger.warn({
+            level: 'warn',
+            message: 'Using fallback email due to student info fetch failure',
+            studentId,
+            email: process.env.FALLBACK_EMAIL || 'parthkulkarni1602@gmail.com',
+            status: 'fallback-used',
+            errorMessage: error.message,
+            timestamp: new Date(),
+          });
+
         return {
           email: process.env.FALLBACK_EMAIL || 'parthkulkarni1602@gmail.com',
           name: 'Test Student',
@@ -163,7 +211,7 @@ export class NotificationService {
             <p>This email is for immediate information only and cannot be treated as original statement of marks. Please verify the information from the original statement of marks issued by Examination Board separately.</p><br>
             
             <p>Best regards,<br>
-            The Examination Board</p>
+            Examination Board</p>
           </div>
           <div class="footer">
             <p>This is an automated email and replies to this are not monitored. Please do not reply to this email.</p>

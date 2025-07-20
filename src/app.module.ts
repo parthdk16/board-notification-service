@@ -5,9 +5,10 @@ import { NotificationService } from './notification/notification.service';
 import { NotificationController } from './notification/notification.controller';
 import { HttpModule } from '@nestjs/axios';
 import { AuthModule } from './auth/auth.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
-  imports: [HttpModule, AuthModule],
+  imports: [HttpModule, AuthModule, LoggerModule],
   controllers: [AppController, NotificationController],
   providers: [AppService, NotificationService],
 })

@@ -22,5 +22,4 @@ class ResultDataDto {
   status: string;
   @IsString()
   date: string;
-  // You can add more fields as necessary
 }

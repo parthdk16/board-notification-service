@@ -15,7 +15,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://localhost:5672'],
+      urls: ['amqp://127.0.0.1:5672'],
       queue: 'notification_queue',
       queueOptions: {
         durable: true,
@@ -51,8 +51,6 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('notifications', 'Notification management endpoints')
-    .addTag('health', 'Health check endpoints')
-    .addTag('microservice', 'Message pattern documentation')
     .addBearerAuth()
     .build();
 

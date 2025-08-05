@@ -17,7 +17,9 @@ export class CustomLogger implements LoggerService {
         }),
         new winston.transports.MongoDB({
           level: 'info',
-          db: process.env.MONGO_LOG_URI || 'mongodb://localhost:27017/board_exam_users',
+          db:
+            process.env.MONGO_LOG_URI ||
+            'mongodb://127.0.0.1:27017/board_exam_users',
           options: { useUnifiedTopology: true },
           collection: 'notification_logs',
           format: winston.format.combine(

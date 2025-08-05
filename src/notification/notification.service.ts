@@ -124,7 +124,7 @@ export class NotificationService {
     try {
       const token = this.tokenService.getToken();
       const userServiceUrl =
-        process.env.USER_SERVICE_URL || 'http://localhost:3001';
+        process.env.USER_SERVICE_URL || 'http://127.0.0.1:3001';
       const response = await firstValueFrom(
         this.httpService.get(
           `${userServiceUrl}/users/internal/student/${studentId}`,
